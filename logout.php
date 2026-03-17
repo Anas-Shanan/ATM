@@ -1,10 +1,16 @@
 <?php
-session_start(); // Need to start it before you can destroy it
+session_start();
 
-// Wipe all session data on the server
-// Like: req.session.destroy() in Express
+require_once 'config/db.php';
+require_once 'config/security.php';
+
+$user_id = $_SESSION['user_id'] ?? null;
+$card = $_SESSION['card'] ?? null;
+
+log_action($conn, $user_id, 'logout_success', null, $card);
+
+session_unset();
 session_destroy();
-
-// Send them back to login
-header("Location: index.php");
-exit;
+header("Location: login.php");
+exit();
+?>

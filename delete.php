@@ -59,11 +59,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             $conn->commit();
             $savedName = $userData['full_name']; // for the goodbye message
+            $user_id_to_log = $_SESSION['user_id']; // Save before destroying session
 
+            log_action($conn, $user_id_to_log, 'account_deleted');
+            
             session_destroy();
             $deleted = true;
             $success = "Account successfully deleted. Goodbye, " . htmlspecialchars($savedName) . "!";
-            log_action($conn, $_SESSION['user_id'], 'account_deleted');
         } catch (Exception $e) {
             $conn->rollback();
             $error = "Something went wrong. Please try again.";

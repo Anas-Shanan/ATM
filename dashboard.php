@@ -80,7 +80,7 @@ $balance = $data['balance'];
                 </thead>
                 <tbody>
                     <?php foreach ($transactions as $tx): ?>
-                        <tr <?php echo $tx["type"] ?>>
+                        <tr class="<?php echo htmlspecialchars($tx['type']); ?>">
                             <td> <?php echo $tx["type"] === "deposit" ? "⬆️ Deposit" : " ⬇️ Withdraw"; ?></td>
                             <td><?php echo number_format($tx["amount"], 2); ?> </td>
                             <td><?php echo date("M d, Y H.i", strtotime($tx["created_at"])) ?> </td>

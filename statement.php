@@ -3,7 +3,7 @@ require_once 'config/session.php';
 require_once 'config/db.php';
 require_once 'config/security.php';
 
-secure_session_start();
+validate_session_start();
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -35,24 +35,16 @@ $stmt->execute();
 $result = $stmt->get_result();
 $transactions = $result->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
-log_action($conn, $user_id , 'Statement_check');
+log_action($conn, $user_id, 'Statement_check');
+require 'includes/atm_head.php';
 
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
+<div class="screen-inner screen_title">
+    <h1>Account History Cash</h1>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Account Statement</title>
-    <link rel="stylesheet" href="assets/style.css">
-</head>
-
-<body>
-
-    <div style="padding: 10px;">
-        <h1>Transactions History</h1>
+    <div style="padding: 10px; overflow-y:scroll">
+        
 
         <form method="GET" action="statement.php">
             <label for="date_from"> From
@@ -94,6 +86,8 @@ log_action($conn, $user_id , 'Statement_check');
         <?php endif; ?>
         <a href="dashboard.php">← Back to Dashboard</a>
     </div>
-</body>
+</div>
+<?php
 
-</html>
+require 'includes/atm_foot.php';
+?>

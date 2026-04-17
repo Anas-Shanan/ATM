@@ -2,7 +2,7 @@
 require_once 'config/session.php';
 require_once 'config/db.php';
 
-secure_session_start();
+validate_session_start();
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -44,27 +44,19 @@ $user_name = $data['full_name'];
 $card_number = $data['card_number'];
 $balance = $data['balance'];
 /* var_dump($transactions); */
+require 'includes/atm_head.php';
 
 ?>
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ATM Dashboard</title>
-    <link rel="stylesheet" href="assets/style.css">
-</head>
-
-<body>
+<div class="screen-inner screen_title">
 
     <div>
         <p>Welcome, <strong><?php echo htmlspecialchars($user_name); ?></strong></p>
         <p class="card-num">Card: **** **** **** <?php echo substr($card_number, -4); ?></p>
-        <h3>Current balance <?= number_format($balance, 2) ?> $ </h3>
+        <h3 class="screen-balance-label">Current balance <p class="screen-balance-amount"> $ <?= number_format($balance, 2) ?> </p>
+        </h3>
     </div>
 
-    <div style="margin: 10px; display:flex; gap:10px;">
+    <div style="margin: 10px;">
 
         <?php if (empty($transactions)): ?>
             <p>no transactions yet </p>
@@ -80,7 +72,7 @@ $balance = $data['balance'];
                 </thead>
                 <tbody>
                     <?php foreach ($transactions as $tx): ?>
-                        <tr class="<?php echo htmlspecialchars($tx['type']); ?>">
+                        <tr <?php echo $tx["type"] ?>>
                             <td> <?php echo $tx["type"] === "deposit" ? "⬆️ Deposit" : " ⬇️ Withdraw"; ?></td>
                             <td><?php echo number_format($tx["amount"], 2); ?> </td>
                             <td><?php echo date("M d, Y H.i", strtotime($tx["created_at"])) ?> </td>
@@ -100,7 +92,8 @@ $balance = $data['balance'];
         <a href="logs.php">User Logs</a>
         <a href="logout.php">Logout</a>
     </nav>
+</div>
+<?php
 
-</body>
-
-</html>
+require 'includes/atm_foot.php';
+?>

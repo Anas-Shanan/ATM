@@ -3,7 +3,7 @@ require_once 'config/session.php';
 require_once 'config/db.php';
 require_once 'config/security.php';
 
-secure_session_start();
+validate_session_start();
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -15,7 +15,7 @@ $success = "";
 $deleted = false;
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-     verify_csrf();
+    verify_csrf();
 
     $stmt = $conn->prepare("
     SELECT u.full_name, a.balance
@@ -59,13 +59,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             $conn->commit();
             $savedName = $userData['full_name']; // for the goodbye message
-            $user_id_to_log = $_SESSION['user_id']; // Save before destroying session
 
-            log_action($conn, $user_id_to_log, 'account_deleted');
-            
             session_destroy();
             $deleted = true;
             $success = "Account successfully deleted. Goodbye, " . htmlspecialchars($savedName) . "!";
+            log_action($conn, $_SESSION['user_id'], 'account_deleted');
         } catch (Exception $e) {
             $conn->rollback();
             $error = "Something went wrong. Please try again.";
@@ -85,28 +83,31 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $userData = $stmt->get_result()->fetch_assoc();
     $stmt->close();
 }
+
+$page_title = "Withdraw – Geldautomat";
+
+
+$page_script = <<<'JS'
+<script>
+    function confirmKey() {
+        document.getElementById('deleteForm').submit();
+    }
+</script>
+JS;
+
+require 'includes/atm_head.php';
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Delete account</title>
-</head>
-
-<body>
-
+<div class="screen-inner screen_title">
     <h1>Delete Account</h1>
-    <?php if ($error): ?>
+
+    <?php if (!empty($error) && !$deleted): ?>
         <p><?php echo htmlspecialchars($error) ?></p>
         <a href="withdraw.php">Withdraw Money</a>
     <?php endif; ?>
 
     <?php if ($deleted): ?>
         <p><?php echo htmlspecialchars($success) ?></p>
-
         <a href="login.php">Return to Home</a>
 
     <?php else: ?>
@@ -114,24 +115,24 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <p>Card: **** **** ****<?php echo substr($userData['card_number'], -4); ?></p>
         <p>Balance: $<?php echo number_format($userData['balance'], 2); ?></p>
 
-            <?php if ($userData['balance'] > 0): ?>
-                <p>You must withdraw your balance before deleting your account.</p>
-                <a href="withdraw.php">Withdraw Money</a>
+        <?php if ($userData['balance'] > 0): ?>
+            <p>You must withdraw your balance before deleting your account.</p>
+            <a href="withdraw.php">Withdraw Money</a>
 
-            <?php else: ?>
-                <!--    balance is zero here  -->
-                <form action="delete.php" method="POST">
-                    <?php csrf_field(); ?>
-                    <button type="submit"> Yes, Delete My Account </button>
-                </form>
+        <?php else: ?>
+            <!--    balance is zero here  -->
+            <form action="delete.php" method="POST" id="deleteForm">
+                <?php csrf_field(); ?>
+                <button type="submit"> Yes, Delete My Account </button>
+            </form>
 
-            <?php endif; ?>
+        <?php endif; ?>
 
         <br>
 
-        <a href="dashboard.php">Cancel</a>
     <?php endif; ?>
+</div>
+<?php
 
-</body>
-
-</html>
+require 'includes/atm_foot.php';
+?>

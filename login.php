@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = "Your card is locked due to login failed attempts . try again in {$min} minutes";
         log_action($conn, null, 'Card-locked', null, $card);
     } else {
-
+        verify_csrf();
 
         $stmt = $conn->prepare("SELECT * FROM users WHERE card_number = ?");
         $stmt->bind_param("s", $card);
@@ -41,7 +41,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             log_action($conn, null, 'login_failed', null, $card);
             failed_attempt($card);
             $attempts = $_SESSION["login_attempts_" . $card] ?? 0;
-            $remaining = 5 - $attempts;
+            $remaining = max(0, 5 - $attempts);
+
             if ($remaining > 0) {
                 $error = "Invalid card or PIN. {$remaining} attempts remaining ";
             } else {
@@ -50,19 +51,86 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+$page_title = "Login – Geldautomat";
+
+$page_script = <<<'JS'
+<script>
+    // Tracks which field is active and the raw card digits
+    let activeField = 'card';
+    let cardDigits  = '';
+ 
+    function addKey(d) {
+        if (activeField === 'card') {
+            console.log("active field", activeField);
+            const display = document.getElementById('card_display');
+            const real    = document.getElementById('card_number_real');
+            if (!display || !real) return;
+            if (!/[0-9]/.test(d) || cardDigits.length >= 16) return;
+ 
+            cardDigits += d;
+ 
+            let masked = '';
+            for (let i = 0; i < cardDigits.length; i++) {
+                if (i > 0 && i % 4 === 0) masked += ' ';
+                masked += (i >= 12) ? cardDigits[i] : '*';
+            }
+            display.value = masked;
+            real.value    = cardDigits;
+ 
+            // auto-jump to PIN once 16 digits entered
+            if (cardDigits.length === 16) {
+                activeField = 'pin';
+                console.log("active field pin", activeField);
+                document.getElementById('pin').focus();
+            }
+        } else {
+            const pin = document.getElementById('pin');
+            if (!pin) return;
+            if (!/[0-9]/.test(d) || pin.value.length >= 6) return;
+            pin.value += d;
+        }
+    }
+ 
+    function correctKey() {
+        if (activeField === 'card') {
+            const display = document.getElementById('card_display');
+            const real    = document.getElementById('card_number_real');
+            if (!display || !real) return;
+            cardDigits = cardDigits.slice(0, -1);
+ 
+            let masked = '';
+            for (let i = 0; i < cardDigits.length; i++) {
+                if (i > 0 && i % 4 === 0) masked += ' ';
+                masked += (i >= 12) ? cardDigits[i] : '*';
+            }
+            display.value = masked;
+            real.value    = cardDigits;
+        } else {
+            const pin = document.getElementById('pin');
+            if (pin) pin.value = pin.value.slice(0, -1);
+        }
+    }
+ 
+    function confirmKey() {
+        if (activeField === 'card' && cardDigits.length === 16) {
+            activeField = 'pin';
+            document.getElementById('pin').focus();
+        } else {
+            document.getElementById('loginForm').submit();
+        }
+    }
+</script>
+JS;
+
+// ============================================================
+// 3. OPEN ATM SHELL
+// ============================================================
+require 'includes/atm_head.php';
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bankautomat login</title>
-    <link rel="stylesheet" href="assets/style.css">
-</head>
 
-<body>
+<div class="screen-inner screen_title"> 
 
     <h1>User Login</h1>
 
@@ -76,11 +144,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php unset($_SESSION['flash_error']); ?>
     <?php endif; ?>
 
+    <!-- URL flag -->
+    <?php
+    if (isset($_GET['reason']) && $_GET['reason'] === 'expired') {
+        echo "<div class='error'>Your session expired due to inactivity. Please log in again.</div>";
+        header("Location: login.php");
+        exit();
+    }
+    ?>
+
     <?php if (!empty($error)): ?>
         <p style="color:red;"><?= htmlspecialchars($error) ?></p>
     <?php endif; ?>
 
-    <form action="login.php" method="POST">
+    <form action="login.php" method="POST" id="loginForm">
+        <?php csrf_field(); ?>
 
         <label>
             Card Number:
@@ -92,42 +170,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <label>
             PIN Number:
-            <input type="password" name="pin" maxlength="6" placeholder="6-digit password" inputmode="numeric" autocomplete="off" required>
+            <input type="password" id="pin" name="pin" maxlength="6" placeholder="6-digit password" inputmode="numeric" autocomplete="off" required>
         </label>
         <br><br>
 
         <button type="submit">Login</button>
     </form>
-    <button><a href="registration.php">Create Account</a></button>
+    <a href="registration.php">New Account</a>
 
-</body>
+</div>
 
-</html>
-<script>
-    // used AI here
-    const display = document.getElementById('card_display');
-    const real = document.getElementById('card_number_real');
-
-    let digits = ''; // store real digits HERE, not in a hidden input
-
-    display.addEventListener('keydown', (e) => {
-        if (e.key >= '0' && e.key <= '9' && digits.length < 16) {
-            digits += e.key;
-        } else if (e.key === 'Backspace') {
-            digits = digits.slice(0, -1);
-        } else {
-            e.preventDefault();
-            return;
-        }
-
-        // Now build masked display from clean digits
-        let masked = '';
-        for (let i = 0; i < digits.length; i++) {
-            if (i > 0 && i % 4 === 0) masked += ' ';
-            masked += (i >= 12) ? digits[i] : '*';
-        }
-        display.value = masked;
-        real.value = digits; // store clean digits
-        e.preventDefault(); // prevent default so we control display
-    });
-</script>
+<?php require 'includes/atm_foot.php'; ?>

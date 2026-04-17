@@ -1,6 +1,6 @@
-<?php 
+<?php
 $host = "localhost";
-$dbname = "bankautomate";
+$dbname = "atm_db";
 $user = "root";
 $password = "";
 /* try{
@@ -12,13 +12,12 @@ $password = "";
         die("DB Connection faild". $e->getMessage());
     } */
 
-        //MySQLi (object-oriented style) 
+//MySQLi (object-oriented style) 
 
-    $conn = new mysqli($host, $user, $password, $dbname);
+$conn = new mysqli($host, $user, $password, $dbname);
 
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
 
-    define('PEPPER', 's3cr3tPepper!@#');
-?>
+define('PEPPER', 's3cr3tPepper!@#');

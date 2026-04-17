@@ -3,7 +3,7 @@ require_once 'config/session.php';
 require_once 'config/db.php';
 require_once 'config/security.php';
 
-secure_session_start();
+validate_session_start();
 
 
 if (!isset($_SESSION['user_id'])) {
@@ -55,20 +55,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+$page_title = "Pin Change Geldautomat";
+$page_script = <<<'JS'
+
+    <script>
+     let activeInput = null;
+    document.querySelectorAll('.screen-input').forEach(input => {
+        input.addEventListener('focus', () => {
+            activeInput = input;
+        });
+    });
+
+    function addKey(d) {
+        if (!activeInput) return;
+
+        if (!/^\d+$/.test(d)) return;
+
+        const id = activeInput.id;
+
+        if (id === 'current_pin' || id === 'new_pin' || id === 'confirm_pin') {
+            if (activeInput.value.length >= 6) return;
+            activeInput.value += d;
+        }
+    }
+    
+    function correctKey() {
+        if (!activeInput) return;
+        activeInput.value = activeInput.value.slice(0, -1);
+    }
+    
+        function confirmKey() {
+            document.getElementById('pin_changeForm').submit();
+        }
+
+    </script>
+    JS;
+require 'includes/atm_head.php';
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Change PIN</title>
-    <link rel="stylesheet" href="assets/style.css">
-</head>
-
-<body>
-    <div class="card">
+<div class="screen-inner screen_title">
+ 
         <h1>Change PIN</h1>
 
         <?php if (!empty($error)): ?>
@@ -80,31 +106,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php if (empty($success)): // to hide the form after success 
         ?>
 
-            <form action="pin_change.php" method="POST">
+            <form action="pin_change.php" method="POST" id="pin_changeForm">
                 <?php csrf_field(); ?>
                 <label>
                     Current PIN number:
-                    <input type="password" name="current_pin" id="current_pin" maxlength="6" placeholder="current PIN" required autocomplete="off">
+                    <input type="password" name="current_pin" class="screen-input" id="current_pin" maxlength="6" placeholder="current PIN" required autocomplete="off" require autofocus>
 
                 </label>
                 <br><br>
                 <label>
                     please enter your New 6 - digit PIN:
-                    <input type="password" name="new_pin" id="new_pin" maxlength="6" placeholder="new PIN" required>
+                    <input type="password" name="new_pin" class="screen-input" id="new_pin" maxlength="6" placeholder="new PIN" required autofocus>
                 </label>
                 <label>
                     please confirm your New PIN:
-                    <input type="password" name="confirm_pin" id="confirm_pin" maxlength="6" placeholder="confirm new PIN" required>
+                    <input type="password" name="confirm_pin" class="screen-input" id="confirm_pin" maxlength="6" placeholder="confirm new PIN" required autofocus>
                 </label>
                 <br><br>
 
                 <button type="submit">Change PIN</button>
             </form>
         <?php endif; ?>
-        <form method="get" action="dashboard.php">
+       <!--  <form method="get" action="dashboard.php">
             <button type="submit" class="btn-back">← Back to Dashboard</button>
-        </form>
-    </div>
-</body>
-
-</html>
+        </form> -->
+    
+</div>
+<?php require 'includes/atm_foot.php'; ?>

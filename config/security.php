@@ -2,6 +2,11 @@
 
 function failed_attempt($card_number)
 {
+    //to avoid counting the attempts by just refersh the page//
+    if (empty($card_number)) {
+        return;
+    }    
+
     $attempt_key = "login_attempts_" . $card_number;
     $time_key = "login_lockout_until_" . $card_number;
 
@@ -9,11 +14,14 @@ function failed_attempt($card_number)
         $_SESSION[$attempt_key] = 0;
     }
     $_SESSION[$attempt_key]++;
+    echo var_dump($_SESSION[$attempt_key]);
 
     // lock for 15 min
     if ($_SESSION[$attempt_key] >= 5) {
-        $_SESSION[$time_key] = time() + (5 * 60);
-        $_SESSION[$attempt_key] = 0;
+         $lock_time = time() + (5 * 60); // 5 minutes
+        $_SESSION[$time_key] = $lock_time;
+        
+       echo var_dump( $_SESSION[$time_key]);
     }
 }
 

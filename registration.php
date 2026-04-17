@@ -3,7 +3,7 @@ require_once 'config/session.php';
 require_once 'config/db.php';
 require_once 'config/security.php';
 
-secure_session_start();
+session_start();
 
 $errors = [];
 $success = '';
@@ -69,67 +69,96 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     $conn->close();
 }
+
+$page_title = "New Account – Geldautomat";
+
+$page_script = <<<'JS'
+<script>
+        
+    let activeInput = null;
+    document.querySelectorAll('.screen-input').forEach(input => {
+        input.addEventListener('focus', () => {
+            activeInput = input;
+        });
+    });
+
+    function addKey(d) {
+        if (!activeInput) return;
+
+        if (!/^\d+$/.test(d)) return;
+
+        const id = activeInput.id;
+
+        if (id === 'card_number') {
+            if (activeInput.value.length >= 16) return;
+            activeInput.value += d;
+        }
+
+        if (id === 'pin' || id === 'pin_confirm') {
+            if (activeInput.value.length >= 6) return;
+            activeInput.value += d;
+        }
+    }
+    
+    function correctKey() {
+        if (!activeInput) return;
+        activeInput.value = activeInput.value.slice(0, -1);
+    }
+    
+        function confirmKey() {
+            document.getElementById('registrationForm').submit();
+        }
+</script>
+JS;
+
+require 'includes/atm_head.php';
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bankautomat registration</title>
-    <link rel="stylesheet" href="assets/style.css">
-</head>
 
-<body>
+<div class="screen-title screen">New Account</div>
 
-    <h1>User registration</h1>
+<?php if (!empty($errors)): ?>
+    <ul>
+        <?php foreach ($errors as $err): ?>
+            <li><?= htmlspecialchars($err) ?></li>
+        <?php endforeach; ?>
+    </ul>
+<?php endif; ?>
 
-    <?php if (!empty($errors)): ?>
-        <ul>
-            <?php foreach ($errors as $err): ?>
-                <li><?= htmlspecialchars($err) ?></li>
-            <?php endforeach; ?>
-        </ul>
-    <?php endif; ?>
-
-    <form action="registration.php" method="POST">
-         <?php csrf_field(); ?>
-        <label>
-            Full Name:
-            <input type="text" name="full_name" id="full_name" maxlength="50" placeholder="e.g. Maxi Shan" required>
-        </label>
-        <br><br>
-        <label>
-            Card Number:
-            <input type="text" name="card_number" id="card_number" maxlength="16" placeholder="16 digits card number" inputmode="numeric" autocomplete="off" required>
-
-        </label>
-        <br><br>
-
-        <label>
-            PIN Number:
-            <input type="password" name="pin" id="pin" maxlength="6" placeholder="6-digit PIN" inputmode="numeric" required>
-        </label>
-        <br><br>
-        <label>
-            Confirm PIN Number:
-            <input type="password" name="pin_confirm" id="pin_confirm" maxlength="6" placeholder="Confirm PIN" inputmode="numeric" required>
-        </label>
-
-        <button type="submit">Create Account</button>
-    </form>
+<form action="registration.php" method="POST" id="registrationForm">
+    <?php csrf_field(); ?>
+    <label>
+        Full Name:
+        <input type="text" name="full_name" id="full_name" maxlength="50" placeholder="e.g. Maxi Shan" autofocus required>
+    </label>
     <br><br>
-    <div>
-        <span>already registered?</span>
-    </div>
+    <label>
+        Card Number:
+        <input type="text" name="card_number" id="card_number" class="screen-input" maxlength="16" placeholder="16 digits card number" inputmode="numeric" autocomplete="off" autofocus require>
+
+    </label>
+    <br><br>
+
+    <label>
+        PIN Number:
+        <input type="password" name="pin" id="pin" class="screen-input" maxlength="6" placeholder="6-digit PIN" inputmode="numeric" autofocus required>
+    </label>
+    <br><br>
+    <label>
+        Confirm PIN Number:
+        <input type="password" name="pin_confirm" id="pin_confirm" class="screen-input" maxlength="6" placeholder="Confirm PIN" inputmode="numeric" autofocus required>
+    </label>
+
+    <button type="submit">Create Account</button>
+</form>
+<br><br>
+<div>
+    <span>already registered?</span>
+
     <a href="login.php">← Back to Login</a>
-    </div>
+
+</div>
 
 
-    </div>
-
-
-</body>
-
-</html>
+<?php require 'includes/atm_foot.php'; ?>

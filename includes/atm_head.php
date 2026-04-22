@@ -6,51 +6,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $page_title ?? 'Geldautomat' ?></title>
     <link rel="stylesheet" href="assets/style.css">
-
+    <link rel="stylesheet" href="assets/style-src.css">
+    
 </head>
 
 <body>
-    <div class="atm-scene">
-        <div class="container_atm">
-            <div class="atm-machine-shell">
-                <div class="container_body">
+    <div class="container_atm">
+        <div class="container_body">
 
-                    <div class="container_header header">
-                        <div class="title">
-                            <h1>Geldautomat</h1>
+            <div class="container_header header">
+                <div class="title">
+                    <h1>Geldautomat</h1>
+                </div>
+            </div>
+
+            <div class="card-panel">
+                <div class="right-panel">
+                    <div class="receipt-slot">
+                        <div class="slot-header">
+                            <span class="slot-header-text">RECEIPT</span>
+                            <span class="slot-led"></span>
+                        </div>
+                        <div class="receipt-opening"></div>
+                    </div>
+
+                    <div class="card-slot-area">
+                        <div class="slot-header">
+                            <span class="slot-header-text">CARD</span>
+                            <span class="slot-led"></span>
+                        </div>
+                        <div class="card-opening"></div>
+                    </div>
+
+                    <div class="sensor-pad">
+                        <div class="sensor-indicator"></div>
+                        <div class="sensor-led"></div>
+                        <div class="sensor-inner">
+                            <div class="img-container">
+                                <img src="assets/chip1.svg" alt="">
+                            </div>
                         </div>
                     </div>
 
-                    <div class="card-panel">
-                        <div class="right-panel">
-                            <div class="receipt-slot">
-                                <div class="slot-header">
-                                    <span class="slot-header-text">RECEIPT</span>
-                                    <span class="slot-led"></span>
-                                </div>
-                                <div class="receipt-opening"></div>
-                            </div>
+                    <div class="camera-box"></div>
+                </div>
+            </div>
 
-                            <div class="card-slot-area">
-                                <div class="slot-header">
-                                    <span class="slot-header-text">CARD</span>
-                                    <span class="slot-led"></span>
-                                </div>
-                                <div class="card-opening"></div>
-                            </div>
+             <div class="container_screen screen">
+               
+                
 
-                            <div class="sensor-pad">
-                                <div class="sensor-indicator"></div>
-                                <div class="sensor-inner">
-                                    <div class="img-container">
-                                        <img src="assets/chip_9405771.png" alt="">
-                                    </div>
-                                    <div class="sensor-led"></div>
-                                </div>
-                            </div>
-
-                            <div class="camera-box"></div>
-                        </div>
-                    </div>
-
-                    <div class="container_screen screen">

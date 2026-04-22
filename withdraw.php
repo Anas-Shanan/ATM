@@ -16,6 +16,17 @@ $success = "";
 $user_id = $_SESSION['user_id'];
 $values = [25, 50, 100, 150, 200, 500, 1000];
 
+$side_buttons = [
+    'bt1-l' => ['label' => '$25', 'action' => 'preset:25'],
+    'bt1-r' => ['label' => '$50', 'action' => 'preset:50'],
+    'bt2-l' => ['label' => '$100', 'action' => 'preset:100'],
+    'bt2-r' => ['label' => '$200', 'action' => 'preset:200'],
+    'bt3-l' => ['label' => '$500', 'action' => 'preset:500'],
+    'bt3-r' => ['label' => '$1000', 'action' => 'preset:1000'],
+    'bt4-l' => ['label' => 'CLR', 'action' => 'clear'],
+    'bt4-r' => ['label' => 'GO', 'action' => 'submit'],
+];
+
 $stmt = $conn->prepare("
     SELECT accounts.id, accounts.balance
     FROM accounts
@@ -42,11 +53,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (!is_numeric($amount) || empty($amount)) {
-        $error = "please enter a valid amount";
+        $error = "Please enter a valid amount.";
     } elseif ($amount <= 0) {
-        $error = "amount must be more than zero";
+        $error = "Amount must be greater than zero.";
     } elseif ($amount >= 100000) {
-        $error = "Amount must not be more than 100000 $";
+        $error = "Amount must not be more than $100,000.";
         log_action($conn, $user_id, 'Err:exceed withdraw limit', $amount);
     } elseif ($amount > $account['balance']) {
         $error = "Insufficient funds. Your balance is $" . number_format($account['balance'], 2);
@@ -79,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $success = "Successfully withdrew $" . number_format($amount, 2);
             log_action($conn, $user_id, 'withdraw', $amount);
         } catch (Exception $e) {
-            log_action($conn, $user_id, 'wihdraw_transaction_error', $e->getMessage());
+            log_action($conn, $user_id, 'withdraw_transaction_error', $e->getMessage());
             $conn->rollback();
             $error = "Transaction failed. Please try again.";
         }
@@ -95,6 +106,33 @@ $page_script = <<<'JS'
 <script>
     const amountInput = document.getElementById('withdrawAmount');
 
+    function setWithdrawAmount(amount) {
+        amountInput.value = String(amount);
+        amountInput.focus();
+    }
+
+    function handleSideButtonAction(action) {
+        if (!action) return false;
+
+        if (action.startsWith('preset:')) {
+            setWithdrawAmount(action.slice(7));
+            return true;
+        }
+
+        if (action === 'clear') {
+            amountInput.value = '';
+            amountInput.focus();
+            return true;
+        }
+
+        if (action === 'submit') {
+            document.getElementById('withdrawForm').submit();
+            return true;
+        }
+
+        return false;
+    }
+
     function addKey(d) {
         if (d === '.' && amountInput.value.includes('.')) return;
         if (amountInput.value === '0' && d !== '.') amountInput.value = '';
@@ -108,6 +146,14 @@ $page_script = <<<'JS'
     function confirmKey() {
         document.getElementById('withdrawForm').submit();
     }
+
+    function updateClock() {
+        const el = document.getElementById('scr-clock');
+        if (el) el.textContent = new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+
+    updateClock();
+    setInterval(updateClock, 1000);
 </script>
 JS;
 
@@ -116,35 +162,31 @@ require 'includes/atm_head.php';
 ?>
 
 <div class="screen-inner screen_title">
-    <h1>Withdraw Cash</h1>
+    <div class="scr-titlebar">
+        <span class="scr-titlebar-text">Withdraw Cash</span>
+        <span class="scr-clock" id="scr-clock">--:--:--</span>
+    </div>
 
-    <p class="screen-balance-label">Current Balance</p>
-    <p class="screen-balance-amount">$ <?= number_format($account['balance'], 2) ?> </p>
+    <div class="screen-section">
+        <p class="screen-balance-label">Current Balance</p>
+        <p class="screen-balance-amount">$ <?= number_format($account['balance'], 2) ?> </p>
+    </div>
 
     <?php if ($error): ?>
-        <p class="error"><?php echo htmlspecialchars($error); ?></p>
+        <p class="scr-msg error"><?php echo htmlspecialchars($error); ?></p>
     <?php endif; ?>
 
     <?php if ($success): ?>
-        <p class="success"><?php echo htmlspecialchars($success); ?></p>
+        <p class="scr-msg success"><?php echo htmlspecialchars($success); ?></p>
     <?php endif; ?>
 
-    <form method="POST" action="withdraw.php" id="withdrawForm">
+    <form method="POST" action="withdraw.php" id="withdrawForm" class="screen-form-block">
         <?php csrf_field(); ?>
 
-        <label for="amount">Amount to Withdraw</label>
+        <label for="withdrawAmount">Amount to Withdraw</label>
 
-        <div style="display: block; margin:10px">
-            <?php foreach ($values as $value): ?>
-                <button style="padding: 5px;" type="submit" name="preset_amount" value="<?php echo $value; ?>"> <?php echo $value ?> $</button>
-            <?php endforeach; ?>
-        </div>
-        <input type="text" inputmode="decimal" name="custom_amount" id="withdrawAmount" max="100000" min="1" step="0.01" placeholder="Other amount">
-
-        <button type="submit">Withdraw</button>
+        <input type="text" inputmode="decimal" name="custom_amount" id="withdrawAmount" max="100000" min="1" step="0.01" placeholder="Other amount" class="screen-input">
     </form>
-
-    <a href="dashboard.php"> ← Back to Dashboard</a>
 </div>
 <?php
 require 'includes/atm_foot.php';

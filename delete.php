@@ -13,12 +13,13 @@ if (!isset($_SESSION['user_id'])) {
 $error = "";
 $success = "";
 $deleted = false;
+$userData = null;
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     verify_csrf();
 
     $stmt = $conn->prepare("
-    SELECT u.full_name, a.balance
+    SELECT u.full_name, u.card_number, a.balance
     FROM users u
     JOIN accounts a ON a.user_id = u.id
     WHERE u.id = ?
@@ -59,11 +60,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             $conn->commit();
             $savedName = $userData['full_name']; // for the goodbye message
+            log_action($conn, $_SESSION['user_id'], 'account_deleted');
 
             session_destroy();
             $deleted = true;
             $success = "Account successfully deleted. Goodbye, " . htmlspecialchars($savedName) . "!";
-            log_action($conn, $_SESSION['user_id'], 'account_deleted');
         } catch (Exception $e) {
             $conn->rollback();
             $error = "Something went wrong. Please try again.";
@@ -84,14 +85,58 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $stmt->close();
 }
 
-$page_title = "Withdraw – Geldautomat";
+$can_delete_now = !$deleted && !empty($userData) && (float) $userData['balance'] <= 0;
+
+$side_buttons = [
+    'bt1-l' => ['label' => 'DASH', 'action' => 'href:dashboard.php'],
+    'bt1-r' => ['label' => 'WDR', 'action' => 'href:withdraw.php'],
+    'bt2-l' => ['label' => 'DEP', 'action' => 'href:deposit.php'],
+    'bt2-r' => ['label' => 'STM', 'action' => 'href:statement.php'],
+    'bt3-l' => ['label' => 'LOG', 'action' => 'href:logs.php'],
+    'bt3-r' => ['label' => 'PIN', 'action' => 'href:pin_change.php'],
+    'bt4-l' => ['label' => 'OUT', 'action' => 'href:logout.php'],
+    'bt4-r' => ['label' => $deleted ? 'HOME' : ($can_delete_now ? 'DEL' : 'WDR'), 'action' => $deleted ? 'href:login.php' : ($can_delete_now ? 'submit' : 'href:withdraw.php')],
+];
+
+$page_title = "Delete Account – Geldautomat";
 
 
 $page_script = <<<'JS'
 <script>
-    function confirmKey() {
-        document.getElementById('deleteForm').submit();
+    function addKey() {
+        return;
     }
+
+    function correctKey() {
+        return;
+    }
+
+    function handleSideButtonAction(action) {
+        if (action === 'submit') {
+            const form = document.getElementById('deleteForm');
+            if (form) {
+                form.submit();
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    function confirmKey() {
+        const form = document.getElementById('deleteForm');
+        if (form) {
+            form.submit();
+        }
+    }
+
+    function updateClock() {
+        const el = document.getElementById('scr-clock');
+        if (el) el.textContent = new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', second:'2-digit' });
+    }
+
+    updateClock();
+    setInterval(updateClock, 1000);
 </script>
 JS;
 
@@ -99,38 +144,41 @@ require 'includes/atm_head.php';
 ?>
 
 <div class="screen-inner screen_title">
-    <h1>Delete Account</h1>
+    <div class="scr-titlebar">
+        <span class="scr-titlebar-text">Delete Account</span>
+        <span class="scr-clock" id="scr-clock">--:--:--</span>
+    </div>
 
-    <?php if (!empty($error) && !$deleted): ?>
-        <p><?php echo htmlspecialchars($error) ?></p>
-        <a href="withdraw.php">Withdraw Money</a>
-    <?php endif; ?>
+    <div class="screen-section">
 
-    <?php if ($deleted): ?>
-        <p><?php echo htmlspecialchars($success) ?></p>
-        <a href="login.php">Return to Home</a>
-
-    <?php else: ?>
-        <p>Name: <?php echo htmlspecialchars($userData['full_name']); ?></p>
-        <p>Card: **** **** ****<?php echo substr($userData['card_number'], -4); ?></p>
-        <p>Balance: $<?php echo number_format($userData['balance'], 2); ?></p>
-
-        <?php if ($userData['balance'] > 0): ?>
-            <p>You must withdraw your balance before deleting your account.</p>
-            <a href="withdraw.php">Withdraw Money</a>
-
-        <?php else: ?>
-            <!--    balance is zero here  -->
-            <form action="delete.php" method="POST" id="deleteForm">
-                <?php csrf_field(); ?>
-                <button type="submit"> Yes, Delete My Account </button>
-            </form>
-
+        <?php if (!empty($error) && !$deleted): ?>
+            <p class="scr-msg error"><?php echo htmlspecialchars($error) ?></p>
         <?php endif; ?>
 
-        <br>
+        <?php if ($deleted): ?>
+            <p class="scr-msg success"><?php echo htmlspecialchars($success) ?></p>
 
-    <?php endif; ?>
+        <?php elseif (!empty($userData)): ?>
+            <p>Name: <?php echo htmlspecialchars($userData['full_name']); ?></p>
+            <p>Card: **** **** ****<?php echo substr($userData['card_number'], -4); ?></p>
+            <p>Balance: $<?php echo number_format($userData['balance'], 2); ?></p>
+
+            <?php if ($userData['balance'] > 0): ?>
+                <p class="scr-msg warning">You must withdraw your balance before deleting your account.</p>
+
+            <?php else: ?>
+                <!--    balance is zero here  -->
+                <form action="delete.php" method="POST" id="deleteForm">
+                    <?php csrf_field(); ?>
+                </form>
+
+            <?php endif; ?>
+
+        <?php else: ?>
+            <p class="scr-msg error">Account information is not available right now.</p>
+
+        <?php endif; ?>
+    </div>
 </div>
 <?php
 

@@ -1,14 +1,34 @@
-            <button class="side-btn bt1-l">&gt;</button>
-            <button class="side-btn bt1-r">&lt;</button>
+            <?php
+            $default_side_buttons = [
+                'bt1-l' => ['label' => '', 'action' => ''],
+                'bt1-r' => ['label' => '', 'action' => ''],
+                'bt2-l' => ['label' => '', 'action' => ''],
+                'bt2-r' => ['label' => '', 'action' => ''],
+                'bt3-l' => ['label' => '', 'action' => ''],
+                'bt3-r' => ['label' => '', 'action' => ''],
+                'bt4-l' => ['label' => '', 'action' => ''],
+                'bt4-r' => ['label' => '', 'action' => ''],
+            ];
 
-            <button class="side-btn bt2-l">&gt;</button>
-            <button class="side-btn bt2-r">&lt;</button>
+            $side_buttons = array_merge($default_side_buttons, $side_buttons ?? []);
+            $side_slots = array_keys($default_side_buttons);
 
-            <button class="side-btn bt3-l">&gt;</button>
-            <button class="side-btn bt3-r">&lt;</button>
-
-            <button class="side-btn bt4-l">&gt;</button>
-            <button class="side-btn bt4-r">&lt;</button>
+            foreach ($side_slots as $slot):
+                $cfg = $side_buttons[$slot];
+                $arrow = substr($slot, -2) === '-l' ? '&gt;' : '&lt;';
+                $label = trim((string) ($cfg['label'] ?? ''));
+                $action = (string) ($cfg['action'] ?? '');
+                $btn_text = $label !== '' ? $label : $arrow;
+            ?>
+                <button
+                    type="button"
+                    class="side-btn <?= htmlspecialchars($slot) ?><?= $label !== '' ? ' has-label' : '' ?>"
+                    data-slot="<?= htmlspecialchars($slot) ?>"
+                    data-action="<?= htmlspecialchars($action) ?>"
+                    aria-label="<?= htmlspecialchars($label !== '' ? $label : 'Side button') ?>">
+                    <span class="side-btn-text"><?= htmlspecialchars($btn_text) ?></span>
+                </button>
+            <?php endforeach; ?>
             </div>
             <!-- ↑↑↑ SCREEN CONTENT ends here ↑↑↑ -->
 
@@ -49,10 +69,47 @@
             </div>
 
             </div>
-            <!--       </div>
-    </div>
-    </div> -->
+            </div>
 
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const sideButtons = document.querySelectorAll('.side-btn[data-action]');
+
+                    function runDefaultSideAction(action) {
+                        if (!action) return false;
+
+                        if (action.startsWith('href:')) {
+                            window.location.href = action.slice(5);
+                            return true;
+                        }
+
+                        if (action.startsWith('js:')) {
+                            const fnName = action.slice(3);
+                            if (typeof window[fnName] === 'function') {
+                                window[fnName]();
+                                return true;
+                            }
+                        }
+
+                        return false;
+                    }
+
+                    sideButtons.forEach(function(btn) {
+                        btn.addEventListener('click', function() {
+                            const action = btn.dataset.action || '';
+                            const slot = btn.dataset.slot || '';
+
+                            if (typeof window.handleSideButtonAction === 'function') {
+                                const handled = window.handleSideButtonAction(action, slot);
+                                if (handled === true) return;
+                            }
+
+                            runDefaultSideAction(action);
+                        });
+                    });
+                });
+            </script>
 
             <?= $page_script ?? '' ?>
 

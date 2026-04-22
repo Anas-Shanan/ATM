@@ -119,6 +119,24 @@ $page_script = <<<'JS'
             document.getElementById('loginForm').submit();
         }
     }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        const btn = document.querySelector('.bt4-l');
+        if (btn) {
+            btn.onclick = function () {
+                window.location.href = 'registration.php';
+            };}})
+
+   
+
+        function updateClock() {
+        const el = document.getElementById('scr-clock');
+        if (el) el.textContent = new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', second:'2-digit' });
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
+  
 </script>
 JS;
 
@@ -130,32 +148,39 @@ require 'includes/atm_head.php';
 
 
 
-<div class="screen-inner screen_title"> 
+<div class="screen-inner">
+    <!-- Title bar -->
 
-    <h1>User Login</h1>
+    <div class="scr-titlebar">
+        <span class="scr-titlebar-text">CARD LOGIN</span>
+        <span class="scr-clock" id="scr-clock">--:--:--</span>
+    </div>
+
 
     <?php if (isset($_SESSION['flash_success'])): ?>
-        <p style="color:green;"><?= htmlspecialchars($_SESSION['flash_success']) ?></p>
+        <p class=".scr-msg.success"><?= htmlspecialchars($_SESSION['flash_success']) ?></p>
         <?php unset($_SESSION['flash_success']); ?>
     <?php endif; ?>
 
     <?php if (isset($_SESSION['flash_error'])): ?>
-        <p style="color:red;"><?= htmlspecialchars($_SESSION['flash_error']) ?></p>
+        <p class=".scr-msg.error"><?= htmlspecialchars($_SESSION['flash_error']) ?></p>
         <?php unset($_SESSION['flash_error']); ?>
     <?php endif; ?>
 
     <!-- URL flag -->
     <?php
     if (isset($_GET['reason']) && $_GET['reason'] === 'expired') {
-        echo "<div class='error'>Your session expired due to inactivity. Please log in again.</div>";
+        echo "<div class='scr-msg.error'>Your session expired due to inactivity. Please log in again.</div>";
         header("Location: login.php");
         exit();
     }
     ?>
 
-    <?php if (!empty($error)): ?>
-        <p style="color:red;"><?= htmlspecialchars($error) ?></p>
-    <?php endif; ?>
+    <div id="scr-msg"
+        class="scr-msg<?= !empty($error) ? ' error' : '' ?>"
+        style="<?= empty($error) ? 'display:none' : '' ?>">
+        <?= htmlspecialchars($error) ?>
+    </div>
 
     <form action="login.php" method="POST" id="loginForm">
         <?php csrf_field(); ?>
@@ -166,17 +191,20 @@ require 'includes/atm_head.php';
             <input type="hidden" id="card_number_real" name="card_number">
 
         </label>
-        <br><br>
-
         <label>
             PIN Number:
             <input type="password" id="pin" name="pin" maxlength="6" placeholder="6-digit password" inputmode="numeric" autocomplete="off" required>
         </label>
-        <br><br>
+        <br>
 
-        <button type="submit">Login</button>
     </form>
-    <a href="registration.php">New Account</a>
+    <p class="scr-p">
+        Use the keypad to enter your details &nbsp;|&nbsp; Press <strong>ENTER</strong> to confirm
+    </p>
+    <button class="new-AC">
+        <a href="registration.php">NEW ACCOUNT</a>
+    </button>
+
 
 </div>
 

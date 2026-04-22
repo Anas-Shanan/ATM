@@ -1,0 +1,101 @@
+form {
+  align-self: start;
+  padding: 10px;
+  width: 100%;
+  input {
+    width: 80%;
+  }
+  input:focus {
+    outline: 1px solid aqua;
+    box-shadow: 0 0 0 2px rgba(26, 58, 110, 0.12);
+  }
+}
+
+.scr-p {
+  font-size: 14px;
+  color: #777;
+  text-align: center;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid #dde4ee;
+}
+
+.scr-link {
+  font-size: 14px;
+  color: white;
+  cursor: pointer;
+  display: inline-block;
+  margin-top: 6px;
+}
+
+.scr-msg.error {
+  border-color: #cc0000;
+  color: #fc2c2c;
+  display: block;
+  padding-left: 20px;
+}
+.scr-msg.info {
+  border-color: aquamarine;
+  color: aqua;
+  display: block;
+  padding-left: 20px;
+}
+.scr-msg.warning {
+  border-color: #c88000;
+  color: #7a5000;
+  display: block;
+  padding-left: 20px;
+}
+.scr-msg.success {
+  border-color: #1a7a30;
+  color: #0f5020;
+  display: block;
+  padding-left: 20px;
+}
+
+button.new-AC {
+  position: absolute;
+  bottom: 1.3rem;
+  left: 4rem;
+  background-color: black;
+  a {
+    background-color: transparent;
+    color: green;
+    text-decoration: none;
+  }
+}
+button.btn-LOGIN {
+  position: absolute;
+  bottom: 1.3rem;
+  right: 4rem;
+  background-color: black;
+  font-size: 0.8rem;
+  letter-spacing: 1.3px;
+  margin-top: 5px;
+
+  a {
+    background-color: transparent;
+    color: green;
+    text-decoration: none;
+  }
+}
+
+.scr-titlebar {
+  width: 100%;
+  padding: 20px 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.scr-titlebar-text {
+  color: aqua;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: capitalize;
+}
+.scr-clock {
+  color: aqua;
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+}

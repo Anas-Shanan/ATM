@@ -15,6 +15,17 @@ $user_id = $_SESSION['user_id'];
 $error   = "";
 $success = "";
 
+$side_buttons = [
+    'bt1-l' => ['label' => '$20', 'action' => 'preset:20'],
+    'bt1-r' => ['label' => '$50', 'action' => 'preset:50'],
+    'bt2-l' => ['label' => '$100', 'action' => 'preset:100'],
+    'bt2-r' => ['label' => '$200', 'action' => 'preset:200'],
+    'bt3-l' => ['label' => 'CLR', 'action' => 'clear'],
+    'bt3-r' => ['label' => 'GO', 'action' => 'submit'],
+    'bt4-l' => ['label' => 'MENU', 'action' => 'href:dashboard.php'],
+    'bt4-r' => ['label' => 'STM', 'action' => 'href:statement.php'],
+];
+
 $stmt = $conn->prepare("
     SELECT accounts.id, accounts.balance
     FROM accounts
@@ -79,6 +90,33 @@ $page_script = <<<'JS'
 
 <script>
     const amountInput = document.getElementById('depositAmount');
+
+    function setDepositAmount(amount) {
+        amountInput.value = String(amount);
+        amountInput.focus();
+    }
+
+    function handleSideButtonAction(action) {
+        if (!action) return false;
+
+        if (action.startsWith('preset:')) {
+            setDepositAmount(action.slice(7));
+            return true;
+        }
+
+        if (action === 'clear') {
+            amountInput.value = '';
+            amountInput.focus();
+            return true;
+        }
+
+        if (action === 'submit') {
+            document.getElementById('depositForm').submit();
+            return true;
+        }
+
+        return false;
+    }
  
     function addKey(d) {
         if (d === '.' && amountInput.value.includes('.')) return;
@@ -93,6 +131,14 @@ $page_script = <<<'JS'
     function confirmKey() {
         document.getElementById('depositForm').submit();
     }
+
+    function updateClock() {
+        const el = document.getElementById('scr-clock');
+        if (el) el.textContent = new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', second:'2-digit' });
+    }
+
+    updateClock();
+    setInterval(updateClock, 1000);
 </script>
 
 JS;
@@ -105,17 +151,22 @@ require 'includes/atm_head.php';
 
 
 <div class="screen-inner screen_title">
-    <h1>Deposit Cash</h1>
+    <div class="scr-titlebar">
+        <span class="scr-titlebar-text">Deposit Cash</span>
+        <span class="scr-clock" id="scr-clock">--:--:--</span>
+    </div>
 
-    <p class="screen-balance-label">Current Balance</p>
-    <p class="screen-balance-amount">$ <?= number_format($account['balance'], 2) ?></p>
+    <div class="screen-section">
+        <p class="screen-balance-label">Current Balance</p>
+        <p class="screen-balance-amount">$ <?= number_format($account['balance'], 2) ?></p>
+    </div>
 
     <?php if ($error): ?>
-        <p class="screen-message error"><?= htmlspecialchars($error) ?></p>
+        <p class="scr-msg error"><?= htmlspecialchars($error) ?></p>
     <?php endif; ?>
 
     <?php if ($success): ?>
-        <p class="screen-message success"><?= htmlspecialchars($success) ?></p>
+        <p class="scr-msg success"><?= htmlspecialchars($success) ?></p>
     <?php endif; ?>
 
     <form method="POST" action="deposit.php" id="depositForm">
@@ -132,13 +183,7 @@ require 'includes/atm_head.php';
                 placeholder="0.00"
                 required>
         </div>
-
-        <button type="submit" class="screen-submit-btn">
-            Confirm Deposit
-        </button>
     </form>
-
-    <a href="dashboard.php" class="screen-link">&#9664; Back to Menu</a>
 </div>
 
 <?php

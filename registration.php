@@ -105,9 +105,23 @@ $page_script = <<<'JS'
         activeInput.value = activeInput.value.slice(0, -1);
     }
     
-        function confirmKey() {
+    function confirmKey() {
             document.getElementById('registrationForm').submit();
         }
+
+     document.addEventListener('DOMContentLoaded', function () {
+        const btn = document.querySelector('.bt4-r');
+        if (btn) {
+            btn.onclick = function () {
+                window.location.href = 'login.php';
+            };}})
+
+    function updateClock() {
+        const el = document.getElementById('scr-clock');
+        if (el) el.textContent = new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', second:'2-digit' });
+    }
+    updateClock();
+    setInterval(updateClock, 1000); 
 </script>
 JS;
 
@@ -116,48 +130,58 @@ require 'includes/atm_head.php';
 
 
 
-<div class="screen-title screen">New Account</div>
 
-<?php if (!empty($errors)): ?>
-    <ul>
-        <?php foreach ($errors as $err): ?>
-            <li><?= htmlspecialchars($err) ?></li>
-        <?php endforeach; ?>
-    </ul>
-<?php endif; ?>
+<div class="screen-inner ">
+    <div class="scr-titlebar">
+        <span class="scr-titlebar-text">NEW ACCOUNT</span>
+        <span class="scr-clock" id="scr-clock">--:--:--</span>
+    </div>
 
-<form action="registration.php" method="POST" id="registrationForm">
-    <?php csrf_field(); ?>
-    <label>
-        Full Name:
-        <input type="text" name="full_name" id="full_name" maxlength="50" placeholder="e.g. Maxi Shan" autofocus required>
-    </label>
-    <br><br>
-    <label>
-        Card Number:
-        <input type="text" name="card_number" id="card_number" class="screen-input" maxlength="16" placeholder="16 digits card number" inputmode="numeric" autocomplete="off" autofocus require>
+    <div id="scr-msg"
+        class="scr-msg<?= !empty($errors) ? ' error' : '' ?>"
+        style="<?= empty($errors) ? 'display:none' : '' ?>">
+        <?php if (!empty($errors)): ?>
+            <div>
+                <?php foreach ($errors as $err): ?>
+                    <p class="scr-msg.error"><?= htmlspecialchars($err) ?></p>
+                <?php endforeach; ?>
+                </div>
+        <?php endif; ?>
+    </div>
 
-    </label>
-    <br><br>
+    <form action="registration.php" method="POST" id="registrationForm">
+        <?php csrf_field(); ?>
+        <label>
+            Full Name:
+            <input type="text" name="full_name" id="full_name" maxlength="50" placeholder="e.g. Maxi Shan" autofocus required>
+        </label>
 
-    <label>
-        PIN Number:
-        <input type="password" name="pin" id="pin" class="screen-input" maxlength="6" placeholder="6-digit PIN" inputmode="numeric" autofocus required>
-    </label>
-    <br><br>
-    <label>
-        Confirm PIN Number:
-        <input type="password" name="pin_confirm" id="pin_confirm" class="screen-input" maxlength="6" placeholder="Confirm PIN" inputmode="numeric" autofocus required>
-    </label>
+        <label>
+            Card Number:
+            <input type="text" name="card_number" id="card_number" class="screen-input" maxlength="16" placeholder="16 digits card number" inputmode="numeric" autocomplete="off" autofocus require>
 
-    <button type="submit">Create Account</button>
-</form>
-<br><br>
-<div>
-    <span>already registered?</span>
+        </label>
 
-    <a href="login.php">← Back to Login</a>
 
+        <label>
+            PIN Number:
+            <input type="password" name="pin" id="pin" class="screen-input" maxlength="6" placeholder="6-digit PIN" inputmode="numeric" autofocus required>
+        </label>
+
+        <label>
+            Confirm PIN Number:
+            <input type="password" name="pin_confirm" id="pin_confirm" class="screen-input" maxlength="6" placeholder="Confirm PIN" inputmode="numeric" autofocus required>
+        </label>
+
+       
+    </form>
+
+  
+     <button class="btn-LOGIN">
+        <a href="login.php">You already have account -> LOGIN</a>
+    </button>
+
+ 
 </div>
 
 

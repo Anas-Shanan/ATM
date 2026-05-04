@@ -5,7 +5,7 @@ ATM is a PHP/MySQL ATM simulation web application with an ATM-style interface an
 ## Final Result
 
 <p align="center">
-   <img src="final-result.png" alt="Final look of the ATM project" width="850">
+   <img src="final-result.png" alt="Final look of the ATM project" width="650">
 </p>
 
 ## Features

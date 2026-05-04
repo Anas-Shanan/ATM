@@ -14,7 +14,6 @@ function failed_attempt($card_number)
         $_SESSION[$attempt_key] = 0;
     }
     $_SESSION[$attempt_key]++;
-    echo var_dump($_SESSION[$attempt_key]);
 
     // lock for 15 min
     if ($_SESSION[$attempt_key] >= 5) {

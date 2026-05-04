@@ -7,7 +7,7 @@
     <title><?= $page_title ?? 'Geldautomat' ?></title>
     <link rel="stylesheet" href="assets/style.css">
     <link rel="stylesheet" href="assets/style-src.css">
-    
+
 </head>
 
 <body>
@@ -16,7 +16,9 @@
 
             <div class="container_header header">
                 <div class="title">
-                    <h1>Geldautomat</h1>
+
+                    <h1>Geld <span class="slot-led-header"></span> automat
+                    </h1>
                 </div>
             </div>
 
@@ -48,11 +50,13 @@
                         </div>
                     </div>
 
-                    <div class="camera-box"></div>
+                    <div class="camera-box">
+                        <span class="camera1">
+                            <span class="camera2"><span class="camera-led"></span></span>
+                        </span>
+                        
+                    </div>
                 </div>
             </div>
 
-             <div class="container_screen screen">
-               
-                
-
+            <div class="container_screen screen">

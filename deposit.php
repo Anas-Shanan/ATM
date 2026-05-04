@@ -157,8 +157,9 @@ require 'includes/atm_head.php';
     </div>
 
     <div class="screen-section">
-        <p class="screen-balance-label">Current Balance</p>
-        <p class="screen-balance-amount">$ <?= number_format($account['balance'], 2) ?></p>
+     <p class="screen-balance-label">Current Balance
+                <span class="screen-balance-amount"><span class="bracket"> [ </span><?= number_format($account['balance'], 2) ?> <span class="bracket"> ] </span> $ </span>
+      
     </div>
 
     <?php if ($error): ?>

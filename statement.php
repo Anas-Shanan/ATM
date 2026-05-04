@@ -149,9 +149,9 @@ require 'includes/atm_head.php';
                     </thead>
                     <tbody>
                         <?php foreach ($transactions as $tx): ?>
-                            <tr>
+                            <tr class="<?php echo $tx['type']; ?>">
                                 <td><?php echo date('M d, Y H:i', strtotime($tx['created_at'])); ?></td>
-                                <td class="<?php echo $tx['type']; ?>">
+                                <td >
                                     <?php echo ucfirst($tx['type']); ?>
                                 </td>
                                 <td>

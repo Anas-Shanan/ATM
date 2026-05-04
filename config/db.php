@@ -1,6 +1,6 @@
 <?php
 $host = "localhost";
-$dbname = "atm_db";
+$dbname = "bankautomat";
 $user = "root";
 $password = "";
 /* try{

@@ -59,10 +59,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $stmt->close();
 
             $conn->commit();
-            $savedName = $userData['full_name']; // for the goodbye message
-            log_action($conn, $_SESSION['user_id'], 'account_deleted');
 
             session_destroy();
+
             $deleted = true;
             $success = "Account successfully deleted. Goodbye, " . htmlspecialchars($savedName) . "!";
         } catch (Exception $e) {
@@ -103,31 +102,25 @@ $page_title = "Delete Account – Geldautomat";
 
 $page_script = <<<'JS'
 <script>
-    function addKey() {
-        return;
-    }
-
-    function correctKey() {
-        return;
-    }
+    function addKey() { return; }
+    function correctKey() { return; }
 
     function handleSideButtonAction(action) {
         if (action === 'submit') {
-            const form = document.getElementById('deleteForm');
-            if (form) {
-                form.submit();
-            }
+            submitDelete();
             return true;
         }
-
         return false;
     }
 
-    function confirmKey() {
+    function submitDelete() {
         const form = document.getElementById('deleteForm');
-        if (form) {
-            form.submit();
-        }
+        if (!form) return; // form only exists when balance is 0 — safe guard
+        form.submit();
+    }
+
+    function confirmKey() {
+        submitDelete();
     }
 
     function updateClock() {
@@ -159,15 +152,24 @@ require 'includes/atm_head.php';
             <p class="scr-msg success"><?php echo htmlspecialchars($success) ?></p>
 
         <?php elseif (!empty($userData)): ?>
-            <p>Name: <?php echo htmlspecialchars($userData['full_name']); ?></p>
-            <p>Card: **** **** ****<?php echo substr($userData['card_number'], -4); ?></p>
-            <p>Balance: $<?php echo number_format($userData['balance'], 2); ?></p>
+
+
+            <p class="scr-titlebar-text">Welcome, <strong><?php echo htmlspecialchars($userData['full_name']); ?></strong></p>
+            <p class="card-num">Card: **** **** **** <?php echo substr($userData['card_number'], -4); ?></p>
+            <p class="screen-balance-label">Current Balance
+                <span class="screen-balance-amount"><span class="bracket"> [ </span><?= number_format($userData['balance'], 2); ?> <span class="bracket"> ] </span> $ </span>
+            </p>
 
             <?php if ($userData['balance'] > 0): ?>
                 <p class="scr-msg warning">You must withdraw your balance before deleting your account.</p>
 
             <?php else: ?>
-                <!--    balance is zero here  -->
+                <!-- balance is zero — ready to delete -->
+                <div class="scr-msg warning" style="display:block;">
+                    Your balance is <strong>$0.00</strong>. Your account is ready to be permanently deleted.<br>
+                    Press <strong>DEL</strong> (side button) or <strong>CONFIRM</strong> (keypad) to proceed.
+                </div>
+
                 <form action="delete.php" method="POST" id="deleteForm">
                     <?php csrf_field(); ?>
                 </form>

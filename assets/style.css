@@ -26,7 +26,7 @@
 
   /* 3D perspective */
   --machine-persp: 800px;
-  --keypad-tiltX: 22deg;
+  --keypad-tiltX: 28deg;
   --bg: white;
   --button-bg: rgb(73, 64, 64);
 }
@@ -67,6 +67,14 @@ html {
     inset 0 14px 16px rgba(255, 255, 255, 0.08),
     inset 0 -14px 16px rgba(0, 0, 0, 0.18);
 }
+.title{
+  font-family: 'Orbitron', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--machine-darker);
+  text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+}
 .screen {
   grid-area: screen;
   display: flex;
@@ -76,36 +84,47 @@ html {
   background-color: var(--screen-bg);
   color: aqua;
   transform: translateZ(-10px);
+  box-shadow:
+    inset 0 0 20px rgba(0,0,0,0.9),
+    inset 0 0 4px rgba(0,0,0,0.5),
+    0 0 8px rgba(0,0,0,0.6);
 }
 .cash-deposit {
   grid-area: deposit;
   display: flex;
   justify-content: center;
   background-color: var(--machine-dark);
+  box-shadow: -2px 4px 4px azure, 2px 0px 4px azure;
 }
 .keypad {
   grid-area: keypad;
   display: flex;
   justify-content: center;
+  align-items: start;
   background-color: var(--machine-body);
-
-  border-radius: 5px;
+  perspective: 800px;
+  border-radius: 2px;
   transform: rotateX(-10deg) perspective(200px);
   box-shadow:
-    inset 0 14px 16px rgba(255, 255, 255, 0.08),
-    inset 0 -14px 16px rgba(0, 0, 0, 0.18);
+    inset 2px 14px 16px rgba(255, 255, 255, 0.18),
+    inset -2px -14px 16px rgba(0, 0, 0, 0.18),
+    inset 2px 2px 8px rgba(0, 0, 0, 0.9),
+    0px 4px 8px rgba(0, 0, 0, 0.9),
+    -2px -2px 8px rgba(0, 0, 0, 0.9);
 }
 
 .card-panel {
   grid-area: card;
   background-color: var(--machine-body);
 
-  border-radius: 5px;
+  border-radius: 2px;
   display: flex;
   justify-content: center;
   box-shadow:
     inset 0 14px 16px rgba(255, 255, 255, 0.08),
-    inset 0 -14px 16px rgba(0, 0, 0, 0.18);
+    inset 0 -14px 16px rgba(0, 0, 0, 0.18), 
+    2px 4px 8px rgba(0, 0, 0, 0.9),
+    -2px 0px 8px rgba(0, 0, 0, 0.9);
 }
 /* ===== RIGHT SIDE PANEL ===== */
 .right-panel {
@@ -115,6 +134,7 @@ html {
   flex-direction: column;
   justify-content: center;
   gap: 100px;
+  box-shadow: inset 0 14px 16px rgba(255, 255, 255, 0.08), inset 0 -14px 16px rgba(0, 0, 0, 0.18);
 }
 
 /* Receipt slot */
@@ -255,11 +275,13 @@ html {
 .camera-box {
   background: linear-gradient(160deg, #1a1e22, #0a0e12);
   border-radius: 4px;
-  width: 120px;
-  height: 55px;
+  width: 100px;
+  height: 60px;
   border: 1px solid #3a4350;
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
   place-self: center;
+  display: grid;
+  place-items: center;
 }
 /* ===== CASH SLOT ===== */
 .cash-slot-area {
@@ -295,6 +317,16 @@ html {
   background: var(--green-led);
   box-shadow: 0 0 6px var(--green-led);
   animation: led-blink 2s ease-in-out infinite;
+  
+}
+.slot-led-header {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green-led);
+  box-shadow: 0 0 6px var(--green-led);
+  animation: led-blink 2s ease-in-out infinite;
+  display: inline-block;
 }
 @keyframes led-blink {
   0%,
@@ -332,9 +364,26 @@ html {
   );
   transform: translateY(-50%);
 }
+.container-keypad{
+  position:relative;
+    border-left: 30px solid transparent;
+  border-right: 30px solid transparent;
+  border-bottom:135px solid #c5cacf ;
 
+
+}
+.keypad-front{
+  display: flex;
+  justify-content: center;
+   transform: rotateX(45deg);
+   background-color: #c9cbcc;
+   border-radius: 5px;
+
+
+}
 .keypad-wrapper {
   /* This creates the 3D space for the tilt */
+  width:50%;
   perspective: 400px;
   perspective-origin: 70% 90%;
   padding: 0 18px 20px;
@@ -343,6 +392,7 @@ html {
 }
 
 .keypad-inner {
+  height: 80%;
   background: linear-gradient(170deg, #b8c2cc 0%, #9aa4ae 50%, #8a9298 100%);
   border-radius: 8px 8px 12px 12px;
   padding: 12px 16px 16px;
@@ -354,12 +404,12 @@ html {
   transform: rotateX(var(--keypad-tiltX));
   transform-origin: bottom center;
 
-  box-shadow:
+/*   box-shadow:
     0 -2px 0 rgba(255, 255, 255, 0.3),
     0 8px 24px rgba(0, 0, 0, 0.5),
     0 4px 0 var(--metal-shadow),
     inset 0 2px 0 rgba(255, 255, 255, 0.3),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2); */
 }
 
 .keypad-nums {
@@ -425,66 +475,64 @@ html {
 }
 
 .key:hover {
-  background: linear-gradient(180deg, #bdccda 0%, #c8d0d8 45%, #b8c0c8 100%);
+  background: linear-gradient(180deg, #d8e0e8 0%, #c0c8d0 40%, #b0b8c0 100%);
+  filter: brightness(1.05);
 }
-
+.side-btn:hover {
+  background: linear-gradient(180deg, #c8d0d8 0%, #aab2bb 50%, #9aa2ab 100%);
+  transform: translateY(1px);
+  box-shadow:
+    0 1px 0 #6a7480,
+    inset 0 1px 0 rgba(255,255,255,0.5);
+}
 .key:active {
   top: 4px;
+  transition: transform 0,5s;
   box-shadow:
     0 1px 0 #7a8290,
     inset 0 3px 5px rgba(0, 0, 0, 0.25);
 }
 
 .key-cancel {
-  color: #fff;
-  font-size: 12px;
+  color: #080808;
+  font-size: 13px;
   font-weight: 600;
-  letter-spacing: 1.1px;
-  border-bottom: 2px solid red;
+  letter-spacing: 1px;
+  border-bottom: 3px solid red;
+  text-align: center;
   box-shadow:
     -6px -6px 13px #838b94,
     6px 6px 13px #b1bdc8;
 }
 
-.key-cancel:active {
-  box-shadow:
-    0 1px 0 #601008,
-    inset 0 3px 5px rgba(0, 0, 0, 0.3);
-}
 
 .key-correct {
-  color: #fff;
+  color: #0a0a0a;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 1px;
-  border-bottom: 2px solid yellow;
-  box-shadow:
+  text-align: center;
+   border-bottom: 3px solid yellow;
+   box-shadow:
     -6px -6px 13px #838b94,
     6px 6px 13px #b1bdc8;
 }
 
-.key-correct:active {
-  box-shadow:
-    0 1px 0 #604000,
-    inset 0 3px 5px rgba(0, 0, 0, 0.3);
-}
+
 
 .key-confirm {
-  color: #fff;
-  font-size: 9px;
-  font-weight: 700;
+  color: #080808;
+  font-size: 10px;
+  font-weight: 600;
   letter-spacing: 1px;
-  border-bottom: 2px solid green;
-  box-shadow:
+  border-bottom: 3px solid green;
+  text-align: center;
+   box-shadow:
     -6px -6px 13px #838b94,
     6px 6px 13px #b1bdc8;
 }
 
-.key-confirm:active {
-  box-shadow:
-    0 1px 0 #104800,
-    inset 0 3px 5px rgba(0, 0, 0, 0.3);
-}
+
 
 /* //========= Screen ======= */
 
@@ -502,9 +550,11 @@ html {
   column-gap: 3px;
   row-gap: 5px;
   background-color: var(--machine-dark);
-  box-shadow:
+ /*  box-shadow:
     inset -41px 41px 82px #68707a,
-    inset 41px -41px 82px #8c98a6;
+    inset 41px -41px 82px #8c98a6,-2px 2px 4px azure, 2px -2px 8px azure; */
+
+   
 }
 
 .screen-inner {
@@ -520,6 +570,9 @@ html {
   flex-wrap: nowrap;
   justify-content: start;
   min-width: 0;
+   box-shadow:
+    2px 2px 8px azure, -2px -2px 8px azure,
+    inset 1px 1px 8px azure, inset -1px -1px 8px azure;
 }
 
 .bt1-l {
@@ -548,119 +601,34 @@ html {
   grid-area: bt4-r;
 }
 
-.deposit {
-  color: #8fe08f;
-  background-color: rgba(20, 70, 24, 0.28);
+
+.camera1 {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgb(190, 188, 188);
+  position: relative;
+  box-shadow: 3px 3px 18px rgba(238, 234, 234, 0.1),inset 6px 6px 12px rgba(206, 28, 28, 0.1);
 }
 
-.withdraw {
-  color: #f4aaaa;
-  background-color: rgba(95, 20, 20, 0.25);
+.camera2 {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid rgb(190, 190, 190);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 3px 3px 18px rgba(214, 212, 212, 0.1),inset 6px 6px 12px rgba(189, 43, 43, 0.1);
+  display: grid;
+  place-items: center;
 }
+.camera-led{
+background-color: rgb(156, 51, 51);
+width: 6px;
+height: 6px;
+border-radius: 5px;
+animation: led-blink 2s ease-in-out infinite;
 
-.atm-table {
-  border-collapse: collapse;
-  margin-top: 8px;
-  width: 100%;
-  max-width: 100%;
-  font-size: 0.95rem;
-  background: rgba(10, 15, 20, 0.55);
-}
-
-.atm-table th,
-.atm-table td {
-  padding: 6px 8px;
-  border: 1px solid rgba(188, 201, 208, 0.6);
-  vertical-align: middle;
-}
-
-.atm-table th {
-  color: #eef4f8;
-  letter-spacing: 0.3px;
-}
-
-.atm-table td {
-  color: #f3f7fa;
-}
-
-.screen-table-wrap {
-  width: 100%;
-  overflow-x: auto;
-}
-
-button {
-  padding: 5px;
-}
-input {
-  padding: 10px 10px;
-  display: block;
-  margin: 5px;
-  border-radius: 8px;
-  background-color: #0a0e12;
-  color: #ffffff;
-  font-size: 1rem;
-}
-label {
-  color: aqua;
-  padding: 5px;
-  font-size: 18px;
-  letter-spacing: 1px;
-}
-
-.screen-section {
-  margin: 10px;
-  padding: 8px 10px;
-  border: 1px solid rgba(0, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.03);
-  max-width: 100%;
-  min-width: 0;
-}
-
-.screen-section-title {
-  color: aqua;
-  font-size: 0.85rem;
-  margin-bottom: 8px;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
-}
-
-.screen-side-map p {
-  margin: 2px 0;
-  color: #d8f9f9;
-  font-size: 0.9rem;
-  overflow-wrap: anywhere;
-}
-
-.screen-form-block {
-  margin: 10px;
-  width: calc(100% - 20px);
-  min-width: 0;
-}
-
-.screen-preset-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin: 8px 0;
-}
-
-.screen-submit-btn {
-  margin-top: 8px;
-}
-
-.screen-link {
-  margin: 10px;
-  color: #d6f8ff;
-}
-
-.scr-msg {
-  margin: 8px 10px;
-  padding: 8px 10px;
-  border: 1px solid currentColor;
-  border-radius: 4px;
-  max-width: 100%;
-  min-width: 0;
-  white-space: normal;
-  overflow-wrap: anywhere;
-  word-break: break-word;
 }

@@ -15,7 +15,7 @@
 
             foreach ($side_slots as $slot):
                 $cfg = $side_buttons[$slot];
-                $arrow = substr($slot, -2) === '-l' ? '&gt;' : '&lt;';
+                $arrow = substr($slot, -2) === '-l' ? '▶' : '◀';
                 $label = trim((string) ($cfg['label'] ?? ''));
                 $action = (string) ($cfg['action'] ?? '');
                 $btn_text = $label !== '' ? $label : $arrow;
@@ -29,6 +29,7 @@
                     <span class="side-btn-text"><?= htmlspecialchars($btn_text) ?></span>
                 </button>
             <?php endforeach; ?>
+
             </div>
             <!-- ↑↑↑ SCREEN CONTENT ends here ↑↑↑ -->
 
@@ -43,29 +44,32 @@
             </div>
 
             <div class="container-keypad keypad">
-                <div class="keypad-wrapper">
-                    <div class="keypad-inner">
-                        <div class="keypad-nums">
-                            <button type="button" class="key" onclick="addKey('1')">1</button>
-                            <button type="button" class="key" onclick="addKey('2')">2</button>
-                            <button type="button" class="key" onclick="addKey('3')">3</button>
-                            <button type="button" class="key" onclick="addKey('4')">4</button>
-                            <button type="button" class="key" onclick="addKey('5')">5</button>
-                            <button type="button" class="key" onclick="addKey('6')">6</button>
-                            <button type="button" class="key" onclick="addKey('7')">7</button>
-                            <button type="button" class="key" onclick="addKey('8')">8</button>
-                            <button type="button" class="key" onclick="addKey('9')">9</button>
-                            <button type="button" class="key" onclick="addKey('.')">.</button>
-                            <button type="button" class="key" onclick="addKey('0')">0</button>
-                            <button type="button" class="key" onclick="addKey('00')">00</button>
-                        </div>
-                        <div class="keypad-actions">
-                            <a class="key key-cancel" href="dashboard.php">Cancel</a>
-                            <button type="button" class="key key-correct" onclick="correctKey()">Correct</button>
-                            <button type="button" class="key key-confirm" onclick="confirmKey()">Confirm</button>
+              
+                    <div class="keypad-wrapper">
+                        <div class="keypad-inner">
+                            <div class="keypad-nums">
+                                <button type="button" class="key" onclick="addKey('1')">1</button>
+                                <button type="button" class="key" onclick="addKey('2')">2</button>
+                                <button type="button" class="key" onclick="addKey('3')">3</button>
+                                <button type="button" class="key" onclick="addKey('4')">4</button>
+                                <button type="button" class="key" onclick="addKey('5')">5</button>
+                                <button type="button" class="key" onclick="addKey('6')">6</button>
+                                <button type="button" class="key" onclick="addKey('7')">7</button>
+                                <button type="button" class="key" onclick="addKey('8')">8</button>
+                                <button type="button" class="key" onclick="addKey('9')">9</button>
+                                <button type="button" class="key" onclick="addKey('.')">.</button>
+                                <button type="button" class="key" onclick="addKey('0')">0</button>
+                                <button type="button" class="key" onclick="addKey('00')">00</button>
+                            </div>
+                            <div class="keypad-actions">
+                                <a class="key key-cancel" href="dashboard.php">CANCEL</a>
+                                <button type="button" class="key key-correct" onclick="correctKey()">CORRECT</button>
+                                <button type="button" class="key"></button>
+                                <button type="button" class="key key-confirm" onclick="confirmKey()">CONFIRM</button>
+                            </div>
                         </div>
                     </div>
-                </div>
+              
             </div>
 
             </div>

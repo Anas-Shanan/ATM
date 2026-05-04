@@ -31,7 +31,7 @@ ATM is a PHP/MySQL ATM simulation web application with an ATM-style interface an
 ## Setup
 
 1. Place the project in your XAMPP web root (for example `htdocs/ATM`).
-2. Create a MySQL database named `atm_db`.
+2. Create a MySQL database named `bankautomat`.
 3. Import your SQL schema/tables for users, accounts, transactions, and user logs.
 4. Confirm database settings in `config/db.php`.
 5. Start Apache and MySQL from XAMPP.

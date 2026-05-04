@@ -19,7 +19,7 @@ This guide is for users with no PHP background.
 5. Open phpMyAdmin:
    - `http://localhost/phpmyadmin`
 6. Create a database named:
-   - `atm_db`
+   - `bankautomat`
 7. Run the SQL script in section 4 below.
 8. Open the app:
    - `http://localhost/ATM/login.php`
@@ -29,7 +29,7 @@ This guide is for users with no PHP background.
 Default config is already set in [config/db.php](config/db.php):
 
 - host: `localhost`
-- database: `atm_db`
+- database: `bankautomat`
 - user: `root`
 - password: empty
 
@@ -37,7 +37,7 @@ If your local setup is different, update [config/db.php](config/db.php).
 
 ## 4) SQL Script (Copy and Run Once)
 
-In phpMyAdmin, select `atm_db`, open SQL tab, and run this:
+In phpMyAdmin, select `bankautomat`, open SQL tab, and run this:
 
 ```sql
 CREATE TABLE IF NOT EXISTS users (

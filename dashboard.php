@@ -78,8 +78,8 @@ require 'includes/atm_head.php';
         <div>
             <p class="scr-titlebar-text">Welcome, <strong><?php echo htmlspecialchars($user_name); ?></strong></p>
             <p class="card-num">Card: **** **** **** <?php echo substr($card_number, -4); ?></p>
-            <p class="screen-balance-label">Current balance
-                <span class="screen-balance-amount">$ <?= number_format($balance, 2) ?></span>
+            <p class="screen-balance-label">Current Balance
+                <span class="screen-balance-amount"><span class="bracket"> [ </span><?= number_format($balance, 2) ?> <span class="bracket"> ] </span> $ </span>
             </p>
         </div>
 
@@ -105,7 +105,7 @@ require 'includes/atm_head.php';
                     <tbody>
                         <?php foreach ($transactions as $tx): ?>
                             <tr class="<?php echo htmlspecialchars($tx['type']); ?>">
-                                <td> <?php echo $tx["type"] === "deposit" ? "⬆️ Deposit" : " ⬇️ Withdraw"; ?></td>
+                                <td> <?php echo $tx["type"] === "deposit" ? "⬆ Deposit" : " ⬇ Withdraw"; ?></td>
                                 <td><?php echo number_format($tx["amount"], 2); ?> </td>
                                 <td><?php echo date("M d, Y H.i", strtotime($tx["created_at"])) ?> </td>
                             </tr>
@@ -114,8 +114,11 @@ require 'includes/atm_head.php';
                 </table>
             </div>
         <?php endif; ?>
-
+        
     </div>
+    <button class="btn-LOGOUT">
+   <a href="logout.php">EXIT</a>
+</button>
 </div>
 <?php
 

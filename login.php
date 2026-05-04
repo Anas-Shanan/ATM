@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (is_locked_out($card)) {
         $min = lockout_remaining($card);
-        $error = "Your card is locked due to login failed attempts . try again in {$min} minutes";
+        $error = "Your card is locked due to login failed attempts . Try again in {$min} minutes";
         log_action($conn, null, 'Card-locked', null, $card);
     } else {
         verify_csrf();
@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($remaining > 0) {
                 $error = "Invalid card or PIN. {$remaining} attempts remaining ";
             } else {
-                $error = "Too many failed attempts. try again in 5 minutes";
+                $error = "Too many failed attempts. Try again in 5 minutes";
             }
         }
     }
@@ -140,9 +140,7 @@ $page_script = <<<'JS'
 </script>
 JS;
 
-// ============================================================
-// 3. OPEN ATM SHELL
-// ============================================================
+
 require 'includes/atm_head.php';
 ?>
 
@@ -158,12 +156,12 @@ require 'includes/atm_head.php';
 
 
     <?php if (isset($_SESSION['flash_success'])): ?>
-        <p class=".scr-msg.success"><?= htmlspecialchars($_SESSION['flash_success']) ?></p>
+        <p class="scr-msg.success"><?= htmlspecialchars($_SESSION['flash_success']) ?></p>
         <?php unset($_SESSION['flash_success']); ?>
     <?php endif; ?>
 
     <?php if (isset($_SESSION['flash_error'])): ?>
-        <p class=".scr-msg.error"><?= htmlspecialchars($_SESSION['flash_error']) ?></p>
+        <p class="scr-msg.error"><?= htmlspecialchars($_SESSION['flash_error']) ?></p>
         <?php unset($_SESSION['flash_error']); ?>
     <?php endif; ?>
 
@@ -199,7 +197,7 @@ require 'includes/atm_head.php';
 
     </form>
     <p class="scr-p">
-        Use the keypad to enter your details &nbsp;|&nbsp; Press <strong>ENTER</strong> to confirm
+        Use the keypad to enter your details &nbsp;|&nbsp; Press <strong>CONFIRM</strong> to enter
     </p>
     <button class="new-AC">
         <a href="registration.php">NEW ACCOUNT</a>

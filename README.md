@@ -2,6 +2,10 @@
 
 ATM is a PHP/MySQL ATM simulation web application with an ATM-style interface and keypad-driven interactions.
 
+## Final Result
+
+![Final look of the ATM project](final-result.png)
+
 ## Features
 
 - Card number and PIN login
